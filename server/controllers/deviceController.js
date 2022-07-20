@@ -4,12 +4,13 @@ const {Device, DeviceInfo} = require("../models/models");
 const ApiError = require("../error/ApiError");
 
 class DeviceController {
-    async create(req, res, next) {
+    async  create(req, res, next) {
         try {
             let {name, price, brandId, typeId, info} = req.body;
             const {img} = req.files;
             let fileName = uuid.v4() + ".jpg";
             await img.mv(path.resolve(__dirname, "..", "static", fileName));
+            const device = await Device.create({name, price, brandId, typeId, img: fileName});
 
             if (info) {
                 info = JSON.parse(info);
@@ -22,7 +23,6 @@ class DeviceController {
                 })
             }
 
-            const device = await Device.create({name, price, brandId, typeId, img: fileName});
             return res.json(device);
         } catch (e) {
             next(ApiError.badRequest(e.message));
